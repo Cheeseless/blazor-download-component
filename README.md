@@ -1,0 +1,1 @@
+This component still requires linking the js file from the RCL

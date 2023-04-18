@@ -1,0 +1,41 @@
+﻿@namespace Cheeseless.DownloadLink
+@inject IJSRuntime JS
+@inherits ComponentBase
+
+<div>
+    <button @onclick="DownloadFileFromStream">
+        @ChildContent
+    </button>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; } 
+
+    [Parameter]
+    public string DownloadPath { get; set; } = string.Empty;
+
+    
+    //todo: option for large file download
+
+
+    private Stream GetFileStream()
+    {
+        var rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+
+        return File.OpenRead($@"{rootPath}/{DownloadPath}");
+    }
+
+    private async Task DownloadFileFromStream()
+    {
+        var fileStream = GetFileStream();
+        var fileName = DownloadPath.Split("/").LastOrDefault();
+
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+
+}
